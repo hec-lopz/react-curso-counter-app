@@ -1,54 +1,52 @@
-import { fireEvent, render, screen } from '@testing-library/react';
-import { CounterApp } from '../src/CounterApp';
+import { fireEvent, render, screen } from "@testing-library/react";
+import { CounterApp } from "../src/CounterApp";
 
+describe("Pruebas en <CounterApp/>", () => {
+  const initialValue = 10;
 
-describe('Pruebas en el <CounterApp />', () => {
+  test("Debe hacer match con el snapshot", () => {
+    render(<CounterApp value={initialValue} />);
 
-    const initialValue = 10;
-    
-    test('debe de hacer match con el snapshot', () => {
-        const { container } = render(<CounterApp value={ initialValue } />);
-        expect( container ).toMatchSnapshot();
-    });
+    expect(screen).toMatchSnapshot();
+  });
 
-    test('debe de mostrar el valor inicial de 100 <CounterApp value={100}>', () => {
-        
-        render( <CounterApp value={ 100 } /> );
-        expect( screen.getByText(100) ).toBeTruthy();
-        // expect( screen.getByRole('heading',{ level: 2}).innerHTML ).toContain('100')
+  test("Debe mostrar el valor inicial de 100", () => {
+    render(<CounterApp value={100} />);
 
-    });
+    const counter = screen.getByRole("heading", { level: 2 });
 
-    test('debe de incrementar con el botón +1', () => {
-        
-        render( <CounterApp value={ initialValue } /> );
-        fireEvent.click( screen.getByText('+1') )
-        expect( screen.getByText('11') ).toBeTruthy();
+    expect(counter.innerHTML).toContain("100");
+  });
 
-    });
+  test("Debe incrementar con el boton +1", () => {
+    render(<CounterApp value={initialValue} />);
 
-    test('debe de decrementar con el botón -1', () => {
-        
-        render( <CounterApp value={ initialValue } /> );
-        fireEvent.click( screen.getByText('-1') );
-        expect( screen.getByText('9') ).toBeTruthy();
+    const btn = screen.getByRole("button", { name: "btn-add" });
+    fireEvent.click(btn);
 
-    });
+    expect(screen.getByText(`${initialValue + 1}`)).toBeTruthy();
+  });
+  test("Debe decrementar con el boton -1", () => {
+    render(<CounterApp value={initialValue} />);
 
-    test('debe de funcionar el botón de reset', () => {
-        
-        render( <CounterApp value={ 355 } /> );
-        fireEvent.click( screen.getByText('+1') );
-        fireEvent.click( screen.getByText('+1') );
-        fireEvent.click( screen.getByText('+1') );
-        // fireEvent.click( screen.getByText('Reset') );
-        fireEvent.click(screen.getByRole('button', { name: 'btn-reset' }));
+    const btn = screen.getByRole("button", { name: "btn-subtract" });
+    fireEvent.click(btn);
 
-        expect( screen.getByText( 355 ) ).toBeTruthy();
+    expect(screen.getByText(`${initialValue - 1}`)).toBeTruthy();
+  });
 
-    });
+  test("Debe funcionar el boton reset", () => {
+    render(<CounterApp value={initialValue} />);
 
+    const resetBtn = screen.getByRole("button", { name: "btn-reset" });
+    const addBtn = screen.getByRole("button", { name: "btn-add" });
+    fireEvent.click(addBtn);
+    fireEvent.click(addBtn);
+    fireEvent.click(addBtn);
+    fireEvent.click(addBtn);
 
+    fireEvent.click(resetBtn);
 
-
+    expect(screen.getByText(`${initialValue}`)).toBeTruthy();
+  });
 });
